@@ -14,15 +14,36 @@
 
     <h1>Dessiner des formes</h1>
     <h2>Rectangle</h2>
-
+    <svg width="500" height="300">
+      <rect x="0" y="0" width="400" height="200" fill="red" id="rectangle"></rect>
+    </svg>
     <h2>Donut</h2>
-
+    <svg width="500" height="300">
+      <g transform="translate(11, 11)">
+        <circle cx="50" cy="50" r="30" stroke="black" fill="transparent" id="donutIn"></circle>
+        <circle cx="50" cy="50" r="60" stroke="black" fill="transparent" id="donutOut"></circle>
+      </g>
+    </svg>
 
     <h2>Ligne</h2>
-
+    <svg width="500" height="300">
+      <line x1="20" x2="80px" y1="50" y2="50" stroke="black" stroke-width="2" transform="rotate(78,20,50)"/>
+    </svg>
 
     <h2>Path</h2>
-
+    <svg width="500" height="300">
+      <path class="letter-e" id="theMotionPath" d="M 10 10 h 30 30 h -30 -30 v 30 30 h 30 30 h -30 -30 v 30 30 h 30 30" fill="none" stroke="steelblue" stroke-width="5"></path>
+      <path class="letter-m" d="M 100 10 v 60 60 v -60 -60 l 30 50 l 30 -50 v 60 60" fill="none" stroke="steelblue" stroke-width="5"></path>
+      <path class="letter-i" d="M 200 10 v 60 60" fill="none" stroke="steelblue" stroke-width="5"></path>
+      <path class="letter-l" d="M 230 10 v 60 60 h 30 30" fill="none" stroke="steelblue" stroke-width="5"></path>
+      <path class="letter-e" d="M 300 10 h 30 30 h -30 -30 v 30 30 h 30 30 h -30 -30 v 30 30 h 30 30" fill="none" stroke="steelblue" stroke-width="5"></path>
+      <circle cx="" cy="" r="5" fill="red">
+        <!-- Définit l'animation -->
+        <animateMotion dur="6s" repeatCount="indefinite">
+          <mpath xlink:href="#theMotionPath"/>
+        </animateMotion>
+      </circle>
+    </svg>
 
     <h1>Animer des formes</h1>
 
