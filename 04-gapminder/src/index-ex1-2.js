@@ -12,16 +12,15 @@ import population from '../data/population_total.csv';
 // console.log(life.map(one => one[2021]));
 // console.log(smallestValue(population, 2021));
 // console.log(biggestValue(population, 2021));
-const YEAR = 1802;
 tabStrToInt(income);
 tabStrToInt(life);
 tabStrToInt(population);
-console.log(smallestValue(life, YEAR));
+console.log(smallestValue(life, 2021));
 
 life.forEach(elm => {
 
-    if (typeof elm[YEAR] === 'undefined' || elm[YEAR] === null) {
-        elm[YEAR] = elm[YEAR-2];
+    if (typeof elm['2021'] === 'undefined' || elm['2021'] === null) {
+        elm['2021'] = elm['2019'];
     }
 });
 const body = d3.select("body");
@@ -45,17 +44,17 @@ let svg = d3.select("#graph")
 
 // Axe X, en fonction du revenu
 let x = d3.scaleLinear()
-    .domain([0, biggestValue(income, YEAR) * 1.1])
+    .domain([0, biggestValue(income, 2021) * 1.1])
     .range([0, width]);
 
 // Axe Y, en fonction de l'âge
 let y = d3.scalePow()
-    .domain([0, biggestValue(life, YEAR) * 1.1])
+    .domain([0, biggestValue(life, 2021) * 1.1])
     .range([ height, 0]);
 
 // La taille des bulles --> Log permet de limiter la différence trop élevée des bulles
 let z = d3.scaleSqrt()
-    .domain([smallestValue(population, YEAR), biggestValue(population, YEAR)])
+    .domain([smallestValue(population, 2021), biggestValue(population, 2021)])
     .range([5, 60]);
 
 
@@ -74,20 +73,20 @@ svg.append('g')
     .data(income)
     .enter()
     .append("circle")
-    .attr("cx", (d) => x(d[YEAR]))
+    .attr("cx", (d) => x(d["2021"]))
     .attr("r", 10)
     .style("fill", `#${Math.floor(Math.random() * 16777215).toString(16)}`)
     .style("opacity", "0.7")
     .attr("stroke", "black")
 
 svg.selectAll("circle").data(life).join()
-    .attr("cy", (d) => y(d[YEAR]));
+    .attr("cy", (d) => y(d["2021"]));
 
 svg.selectAll("circle").data(life).join()
-    .attr("cy", (d) => y(d[YEAR]));
+    .attr("cy", (d) => y(d["2021"]));
 
 svg.selectAll("circle").data(population).join()
-    .attr("r", (d) => z(d[YEAR]));
+    .attr("r", (d) => z(d["2021"]));
 
 
 
@@ -149,6 +148,18 @@ function strToNumber(str) {
     }
 }
 
+// population.forEach(pays => {
+//     let popAnneeCourante = pays['2021'];
+//     if (typeof popAnneeCourante === 'string') {
+//         popAnneeCourante = strToNumber(pays['2021']);
+//     }
+//     pays['2021'] = popAnneeCourante;
+// });
+// console.log(population);
+// console.log(tabStrToInt(population));
+//tabStrToInt(population)
+//console.log(population)
+
 function tabStrToInt(tab) {
     tab.forEach(elm => {
         for (let i = 1800; i < 2050; i++) {
@@ -162,55 +173,62 @@ function tabStrToInt(tab) {
     });
 }
 
-// ____________________________________________
-// Exercice 3
 
-d3.select("body")
-    .append("h1")
-    .attr('id', 'paragraph')
-    .text('Annee')
-let nIntervId;
- 
-function animate() {
-	// regarder si l'intervalle a été déjà démarré
-	if (!nIntervId) {
-		nIntervId = setInterval(play, 1000);
-	}
-	}
- 
-let i = 0;
-function play() {
-    // Recommencer si à la fin du tableau
-    if(i == data.length-1) {
-        i = 0;
-    } else {
-        i++;
-    }
 
-    // Mise à jour graphique
-    d3.select('#paragraphe').text(data[i].annee)
-    updateChart([data[i]]);
-}
- 
-// Mettre en pause
-function stop() {
-			clearInterval(nIntervId);
-			nIntervId = null;
-					}
- 
-// Fonction de mise à jour du graphique
-function updateChart(data_iteration) {
- 
-			svg.selectAll('circle')
-					.data(data_iteration)
-					.join(enter => enter.append('circle')
-					.attr('cx',300)
-					.attr('cy', 150).transition(d3.transition()
-					.duration(500)
-					.ease(d3.easeLinear)).attr('r', d=>d.valeur),
-					update => update.transition(d3.transition()
-					.duration(500)
-					.ease(d3.easeLinear)).attr('r', d=>d.valeur),
-					exit => exit.remove())
-}
- 
+// _______________________________________________________
+/* EXERCICE 2 */
+let listCountries = []
+
+// 
+life.forEach(row => {
+  let countryData = {};
+  countryData[row['country']] = row['2021']
+  listCountries.push(countryData)
+});
+console.log(listCountries);
+
+// let margin = {top: 20, right: 20, bottom: 30, left: 50},
+//   width = 650 - margin.left - margin.right,
+//   height = 500 - margin.top - margin.bottom;
+
+let svgGraph = d3.select("#graph")
+.append("svg")
+.attr("width", width + margin.left + margin.right)
+.attr("height", height + margin.top + margin.bottom);
+
+  // Map and projection
+let path = d3.geoPath();
+let projection = d3.geoMercator()
+  .scale(70)
+  .center([0,20])
+  .translate([width / 2, height / 2]);
+  
+// Data and color scale
+let colorScale = d3.scaleThreshold()
+  .domain([50, 60, 70, 80, 90, 100])
+  .range(d3.schemeGreens[7]);
+
+  d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson").then(function(d){
+      // Draw the map
+      svgGraph.append("g")
+      .selectAll("path")
+      .data(d.features)
+      .join("path")
+      // draw each country
+      .attr("d", d3.geoPath()
+        .projection(projection)
+      )
+      // set id
+      .attr("id", function(d){ return d.properties.name;})
+      .attr("fill", function (d) {
+        let number = 0;
+        listCountries.forEach(country => {
+            if (typeof country[this.id] != "undefined") {
+              console.log(country[this.id]);
+              number = country[this.id]
+            }
+        })
+        console.log(number);
+        return colorScale(number);
+      })
+  })
