@@ -126,7 +126,6 @@ function animate() {
     if (!idInterval) {
         idInterval = setInterval(play, 1000);
     }
-    console.log(idInterval);
 }
 
 
